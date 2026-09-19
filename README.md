@@ -13,6 +13,36 @@ Four instructions' worth of intent, thirteen kernel words and two TXM words in t
 | kernel | `syscall-filter-off` | 6 | Makes the three Protobox syscall-filter entry points return "no filter", so an agent's syscalls are not denied inside a hardened daemon |
 | TXM | `debug-region-any-caller` | 2 | Stops selector 42 (`AssociateDebugRegion`) requiring the *initiating* process to hold `com.apple.private.cs.debugger` |
 
+## First: the patches are not enough on their own
+
+One boot-arg has to be set on the device as well, or `spawn()` and spawn gating still fail no matter
+which firmware is loaded:
+
+```
+thid_should_crash=0
+```
+
+Without it, iOS 27 kills any process that calls `thread_swap_exception_ports` on another task's
+thread, for **any** mask. That is Frida's dyld handshake, so `frida-server` dies with `EXC_GUARD` the
+moment it tries. The crash is gated on an XNU `TUNABLE` — `TUNABLE (bool, thid_should_crash,
+"thid_should_crash", true)` in `ipc_tt.c` — and `set_exception_behavior_violation()` returns "ignore
+the violation" when it is false, so setting the boot-arg does the whole job with no patch at all.
+
+Read what is there first and **append, never replace**: a research device usually carries other
+settings in `boot-args`, and overwriting them breaks whatever put them there.
+
+```bash
+srdtool research spawn /usr/sbin/nvram boot-args
+srdtool research spawn /usr/sbin/nvram "boot-args=<what that printed> thid_should_crash=0"
+```
+
+Then reboot. Unlike a firmware load, this **survives reboots**, so it is done once — and unlike a
+firmware load it has **no automatic fallback**, which makes it the riskier of the two: a boot-arg the
+kernel rejects is a boot loop. This one is a plain `TUNABLE` with no AMFI involvement and booted
+first time.
+
+## The patch set
+
 Nothing else is here. This is the reduced set: the patches that were tried along the way and turned
 out not to be needed are not included, and neither is the reasoning that got there. Each patch's own
 docstring carries what it does, how its site is identified and what the risk of applying it is;
