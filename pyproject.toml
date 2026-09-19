@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "srdpatch"
+version = "1.0.0"
+description = "Kernel and TXM patches that make Frida work on an iOS 27 security research device"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { file = "LICENSE" }
+
+# numpy only makes the scan faster. Without it the pure-Python fallback is
+# correct, just slow, so it is optional on purpose.
+dependencies = []
+
+[project.optional-dependencies]
+fast = ["numpy"]
+
+[project.scripts]
+patch-kernel = "srdpatch.cli.kernel:main"
+patch-txm = "srdpatch.cli.txm:main"
+
+[tool.setuptools.packages.find]
+include = ["srdpatch*"]

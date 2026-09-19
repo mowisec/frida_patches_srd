@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+build/
+
+# Apple firmware. The corpus lives outside this repository on purpose -- these
+# images are Apple's and are not ours to redistribute. Ignored here as well so
+# that a copy dropped in the tree by accident never gets committed.
+kernelcache*
+txm.iphoneos.research*
+*.im4p
+*.ipsw
+firmware/
+work/
