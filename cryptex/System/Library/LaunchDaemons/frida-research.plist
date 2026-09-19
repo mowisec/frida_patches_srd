@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>re.frida.server</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/usr/bin/frida-server</string>
+		<string>--policy-softener=internal</string>
+		<string>-C</string>
+		<string>-l</string>
+		<string>0.0.0.0:27042</string>
+		<string>-d</string>
+		<string>/tmp/frida</string>
+		<string>-v</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>KeepAlive</key>
+	<true/>
+	<key>EnablePressuredExit</key>
+	<false/>
+	<key>EnableTransactions</key>
+	<false/>
+	<key>ProcessType</key>
+	<string>Interactive</string>
+	<key>StandardOutPath</key>
+	<string>/tmp/frida-server.log</string>
+	<key>StandardErrorPath</key>
+	<string>/tmp/frida-server.err</string>
+</dict>
+</plist>
